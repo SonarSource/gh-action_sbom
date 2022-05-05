@@ -1,0 +1,29 @@
+name: Test reusable workflow
+on:
+  pull_request:
+  push:
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  test-workflow:
+    name: Test SonarSource/gh-action_sbom on alpine:latest
+    uses: ./.github/workflows/workflow.yml
+    with:
+      image: alpine:latest
+      filename: test-workflow-bom.json
+      upload-artifact: true
+      upload-release-assets: ${{ contains(github.ref, 'test') }}
+    secrets:
+      GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
+      GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+  test2-workflow:
+    name: Test SonarSource/gh-action_sbom on alpine:latest
+    uses: ./.github/workflows/workflow.yml
+    with:
+      image: alpine:latest
+      filename: test-workflow-bom.json
+      upload-artifact: false
+      upload-release-assets: false
