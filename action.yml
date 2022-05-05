@@ -1,0 +1,70 @@
+name: "CycloneDX SBOM action"
+description: "Generate CycloneDX SBOM with Syft"
+
+inputs:
+  image:
+    required: true
+    description: "The Docker image to scan."
+#    description: "Newline-delimited list of Docker images to scan"
+    default: "example/image_name:tag"
+  filename:
+    required: true
+    description: "The generated SBOM file name"
+#    description: "Newline-delimited list of generated SBOM file names"
+    default: "bom.json"
+  upload-artifact:
+    required: false
+    description: "Attach the SBOM to the workflow"
+    default: true
+  upload-release-assets:
+    required: false
+    description: "Attach the SBOM to the release"
+    default: true
+  syft-version:
+    required: false
+    description: "Syft version"
+    default: v0.45.1
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: anchore/sbom-action@v0.11.0
+      with:
+        image: ${{ inputs.image }}
+        artifact-name: ${{ inputs.filename }}
+        output-file: ${{ inputs.filename }}
+        format: cyclonedx-json
+        syft-version: ${{ inputs.syft-version }}
+        upload-artifact: ${{ inputs.upload-artifact }}
+        upload-release-assets: ${{ inputs.upload-release-assets }}
+      env:
+        SYFT_QUIET: true
+    - name: Sign CycloneDX SBOM
+      if: inputs.upload-artifact == 'true' && env.GPG_PRIVATE_KEY_PASSPHRASE && env.GPG_PRIVATE_KEY_PASSPHRASE
+      shell: bash
+      run: |
+        export GNUPGHOMEDIR=gnupg/
+        mkdir --parent "${GNUPGHOMEDIR}"
+        echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --import <(echo "${GPG_PRIVATE_KEY_BASE64}")
+        echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --detach-sign --armor "${{ inputs.filename }}"
+        rm -rf "${GNUPGHOMEDIR}"
+    - uses: actions/upload-artifact@v3
+      if: inputs.upload-artifact == 'true'
+      with:
+        name: "${{ inputs.filename }}"
+        path: |
+          ${{ inputs.filename }}
+          ${{ inputs.filename }}.asc
+#    - uses: anchore/sbom-action/publish-sbom@v0.11.0
+#      if: inputs.upload-release-assets == 'true'
+#      with:
+#        sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
+    - name: Upload binaries to release
+      if: inputs.upload-release-assets == 'true' && env.GITHUB_TOKEN && startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ env.GITHUB_TOKEN }}
+        file_glob: true
+        file: "${{ inputs.filename }}?(.asc)"
+        tag: ${{ github.ref }}
+        overwrite: true
