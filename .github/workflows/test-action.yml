@@ -1,0 +1,40 @@
+name: Test action
+on:
+  pull_request:
+  push:
+#    branches:
+#      - '**'
+    tags-ignore:
+      - '**'
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  test-action:
+    name: Test SonarSource/gh-action_sbom on alpine:latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: ./
+      - uses: ./ # SonarSource/gh-action_sbom
+        with:
+          image: alpine:latest
+          filename: test-action-bom.json
+          upload-artifact: true
+          upload-release-assets: ${{ contains(github.ref, 'test') }}
+        env:
+          GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+      - run: |
+          test -f test-action-bom.json.asc
+          echo "test-action-bom.json:"
+          head test-action-bom.json
+      - uses: ./ # SonarSource/gh-action_sbom
+        with:
+          image: alpine:latest
+          filename: test2-action-bom.json
+          upload-artifact: false
+          upload-release-assets: false
