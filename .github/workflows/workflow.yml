@@ -1,0 +1,84 @@
+name: "CycloneDX SBOM reusable workflow"
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+        description: "The Docker image to scan."
+        #    description: "Newline-delimited list of Docker images to scan"
+        default: "example/image_name:tag"
+      filename:
+        required: true
+        type: string
+        description: "The generated SBOM file name"
+        #    description: "Newline-delimited list of generated SBOM file names"
+        default: "bom.json"
+      upload-artifact:
+        required: false
+        type: boolean
+        description: "Attach the SBOM to the workflow"
+        default: true
+      upload-release-assets:
+        required: false
+        type: boolean
+        description: "Attach the SBOM to the release"
+        default: true
+      syft-version:
+        required: false
+        type: string
+        description: "Syft version"
+        default: v0.45.1
+    secrets:
+      GPG_PRIVATE_KEY_PASSPHRASE:
+        required: false
+        description: "Required when 'upload-artifact' is true"
+      GPG_PRIVATE_KEY_BASE64:
+        required: false
+        description: "Required when 'upload-artifact' is true"
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anchore/sbom-action@v0.11.0
+        with:
+          image: ${{ inputs.image }}
+          artifact-name: ${{ inputs.filename }}
+          output-file: ${{ inputs.filename }}
+          format: cyclonedx-json
+          syft-version: ${{ inputs.syft-version }}
+          upload-artifact: ${{ inputs.upload-artifact }}
+          upload-release-assets: ${{ inputs.upload-release-assets }}
+        env:
+          SYFT_QUIET: true
+      - name: Sign CycloneDX SBOM
+        if: inputs.upload-artifact
+        shell: bash
+        env:
+          GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+        run: |
+          if [[ ! -v GPG_PRIVATE_KEY_PASSPHRASE || ! -v GPG_PRIVATE_KEY_BASE64 ]]; then exit 0; fi
+          export GNUPGHOMEDIR=gnupg/
+          mkdir --parent "${GNUPGHOMEDIR}"
+          echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --import <(echo "${GPG_PRIVATE_KEY_BASE64}")
+          echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --detach-sign --armor "${{ inputs.filename }}"
+          rm -rf "${GNUPGHOMEDIR}"
+      - uses: actions/upload-artifact@v3
+        if: inputs.upload-artifact
+        with:
+          name: "${{ inputs.filename }}"
+          path: |
+            ${{ inputs.filename }}
+            ${{ inputs.filename }}.asc
+      - name: Upload binaries to release
+        if: inputs.upload-release-assets && startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ github.token }}
+          file_glob: true
+          file: "${{ inputs.filename }}?(.asc)"
+          tag: ${{ github.ref }}
+          overwrite: true
