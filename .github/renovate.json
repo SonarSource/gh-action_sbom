@@ -2,19 +2,5 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "github>SonarSource/renovate-config:re-team"
-    ],
-    "packageRules": [
-        {
-            "matchDatasources": [
-                "docker"
-            ],
-            "matchPackageNames": [
-                "groovy"
-            ],
-            "matchUpdateTypes": [
-                "major"
-            ],
-            "enabled": false
-        }
     ]
 }
