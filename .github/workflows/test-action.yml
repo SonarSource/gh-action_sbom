@@ -2,10 +2,7 @@ name: Test action
 on:
   pull_request:
   push:
-#    branches:
-#      - '**'
-    tags-ignore:
-      - '**'
+    branches: [ '**' ]
   release:
     types:
       - created
@@ -24,8 +21,9 @@ jobs:
           image: alpine:latest
           filename: test-action-bom.json
           upload-artifact: true
-          upload-release-assets: ${{ contains(github.ref, 'test') }}
+          upload-release-assets: true
         env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
           GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
       - run: |

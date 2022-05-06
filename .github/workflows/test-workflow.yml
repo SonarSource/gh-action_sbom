@@ -16,7 +16,7 @@ jobs:
       image: alpine:latest
       filename: test-workflow-bom.json
       upload-artifact: true
-      upload-release-assets: ${{ contains(github.ref, 'test') }}
+      upload-release-assets: true
     secrets:
       GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
       GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}

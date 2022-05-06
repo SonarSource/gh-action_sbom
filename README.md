@@ -103,6 +103,17 @@ git update-ref -m "reset: update branch v1 to tag 1.0.0" refs/heads/v1 1.0.0
 git push origin v1
 ```
 
+## FAQ
+
+### Warning Unexpected input
+
+> ```
+> Warning: Unexpected input(s) 'upload-artifact', 'upload-release-assets', 
+> valid inputs are ['path', 'image', 'registry-username', 'registry-password', 'format', 'github-token', 'artifact-name', 'output-file', 'syft-version', 'dependency-snapshot']
+> ```
+
+The warning can be ignored, see anchore/sbom-action#269
+
 ## References
 
 [Xtranet/RE/Artifact Management#GitHub Actions](https://xtranet-sonarsource.atlassian.net/wiki/spaces/RE/pages/872153170/Artifact+Management#GitHub-Actions)

@@ -72,7 +72,16 @@ jobs:
           path: |
             ${{ inputs.filename }}
             ${{ inputs.filename }}.asc
-      - uses: anchore/sbom-action/publish-sbom@v0.11.0
-        if: inputs.upload-release-assets
+#      - uses: anchore/sbom-action/publish-sbom@v0.11.0
+#        if: inputs.upload-release-assets
+#        with:
+#          sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
+      - name: Upload binaries to release
+        if: inputs.upload-release-assets == 'true'
+        uses: svenstaro/upload-release-action@v2
         with:
-          sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
+          repo_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          file_glob: true
+          file: "${{ inputs.filename }}?(.asc)"
+          tag: ${{ github.ref }}
+          overwrite: true
