@@ -39,7 +39,7 @@ on:
         required: false
         description: "Required when 'upload-artifact' is true"
 #      GITHUB_TOKEN:
-#        required: ${{ upload-release-assets }}
+#        required: false
 #        description: "Required when 'upload-release-assets' is true"
 
 jobs:

@@ -60,10 +60,10 @@ runs:
 #      with:
 #        sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
     - name: Upload binaries to release
-      if: inputs.upload-release-assets == 'true' && env.GITHUB_TOKEN && startsWith(github.ref, 'refs/tags/')
+      if: inputs.upload-release-assets == 'true' && startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ env.GITHUB_TOKEN }}
+        repo_token: ${{ github.token }}
         file_glob: true
         file: "${{ inputs.filename }}?(.asc)"
         tag: ${{ github.ref }}

@@ -23,9 +23,9 @@ jobs:
           upload-artifact: true
           upload-release-assets: true
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
           GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
       - run: |
           test -f test-action-bom.json.asc
           echo "test-action-bom.json:"
