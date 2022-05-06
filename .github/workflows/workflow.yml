@@ -34,8 +34,13 @@ on:
     secrets:
       GPG_PRIVATE_KEY_PASSPHRASE:
         required: false
+        description: "Required when 'upload-artifact' is true"
       GPG_PRIVATE_KEY_BASE64:
         required: false
+        description: "Required when 'upload-artifact' is true"
+#      GITHUB_TOKEN:
+#        required: ${{ upload-release-assets }}
+#        description: "Required when 'upload-release-assets' is true"
 
 jobs:
   sbom:
@@ -72,7 +77,16 @@ jobs:
           path: |
             ${{ inputs.filename }}
             ${{ inputs.filename }}.asc
-      - uses: anchore/sbom-action/publish-sbom@v0.11.0
-        if: inputs.upload-release-assets
+#      - uses: anchore/sbom-action/publish-sbom@v0.11.0
+#        if: inputs.upload-release-assets
+#        with:
+#          sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
+      - name: Upload binaries to release
+        if: inputs.upload-release-assets && startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
         with:
-          sbom-artifact-match: "${{ inputs.filename }}(.asc)?"
+          repo_token: ${{ github.token }}
+          file_glob: true
+          file: "${{ inputs.filename }}?(.asc)"
+          tag: ${{ github.ref }}
+          overwrite: true
