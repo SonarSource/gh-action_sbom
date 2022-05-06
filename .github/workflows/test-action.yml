@@ -23,7 +23,7 @@ jobs:
           upload-artifact: true
           upload-release-assets: true
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
           GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
       - run: |
