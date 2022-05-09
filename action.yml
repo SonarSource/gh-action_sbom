@@ -40,7 +40,7 @@ runs:
       env:
         SYFT_QUIET: true
     - name: Sign CycloneDX SBOM
-      if: inputs.upload-artifact == 'true' && env.GPG_PRIVATE_KEY_PASSPHRASE && env.GPG_PRIVATE_KEY_PASSPHRASE
+      if: inputs.upload-artifact == 'true' && env.GPG_PRIVATE_KEY_PASSPHRASE && env.GPG_PRIVATE_KEY_BASE64
       shell: bash
       run: |
         export GNUPGHOMEDIR=gnupg/
