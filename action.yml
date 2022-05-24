@@ -48,7 +48,7 @@ runs:
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --import <(echo "${GPG_PRIVATE_KEY_BASE64}")
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --detach-sign --armor "${{ inputs.filename }}"
         rm -rf "${GNUPGHOMEDIR}"
-    - uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+    - uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3.1.0
       if: inputs.upload-artifact == 'true'
       with:
         name: "${{ inputs.filename }}"
