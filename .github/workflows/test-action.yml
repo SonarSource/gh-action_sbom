@@ -10,9 +10,26 @@ on:
 
 jobs:
   test-action:
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      VAULT_ADDR: https://vault.sonar.build:8200
     name: Test SonarSource/gh-action_sbom on alpine:latest
     runs-on: ubuntu-latest
     steps:
+      - name: Vault Secrets
+        id: secrets
+        uses: hashicorp/vault-action@7d98524254c38dc6892804f991526ff30905f643 # tag=v2.4.2
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          exportEnv: false
+          method: jwt
+          path: jwt-ghwf
+          role: github-sonarsource-gh-action_sbom
+          secrets: |
+            development/kv/data/sign passphrase | gpg_passphrase;
+            development/kv/data/sign key | gpg_key;
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
         with:
           path: ./
@@ -23,8 +40,8 @@ jobs:
           upload-artifact: true
           upload-release-assets: true
         env:
-          GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PRIVATE_KEY_PASSPHRASE: ${{ steps.secrets.outputs.gpg_passphrase }}
+          GPG_PRIVATE_KEY_BASE64: ${{ steps.secrets.outputs.gpg_key }}
       - run: |
           test -f test-action-bom.json.asc
           echo "test-action-bom.json:"
