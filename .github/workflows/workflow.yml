@@ -42,7 +42,7 @@ jobs:
   sbom:
     runs-on: ubuntu-latest
     steps:
-      - uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a # tag=v0.11.0
+      - uses: anchore/sbom-action@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # tag=v0.13.0
         with:
           image: ${{ inputs.image }}
           artifact-name: ${{ inputs.filename }}
