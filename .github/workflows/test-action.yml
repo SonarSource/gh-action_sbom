@@ -12,7 +12,7 @@ jobs:
   test-action:
     permissions:
       id-token: write
-      contents: read
+      contents: write
     env:
       VAULT_ADDR: https://vault.sonar.build:8200
     name: Test SonarSource/gh-action_sbom on alpine:latest
