@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Vault Secrets
         id: secrets
-        uses: hashicorp/vault-action@130d1f5f4fe645bb6c83e4225c04d64cfb62de6e # v2.5.0
+        uses: hashicorp/vault-action@d1720f055e0635fd932a1d2a48f87a666a57906c # v3.0.0
         with:
           url: ${{ env.VAULT_ADDR }}
           exportEnv: false
