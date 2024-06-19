@@ -55,6 +55,7 @@ runs:
         path: |
           ${{ inputs.filename }}
           ${{ inputs.filename }}.asc
+        overwrite: true
     - name: Upload binaries to release
       if: inputs.upload-release-assets == 'true' && startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # v2
