@@ -79,4 +79,3 @@ jobs:
           file_glob: true
           file: "${{ inputs.filename }}?(.asc)"
           tag: ${{ github.ref }}
-          overwrite: true
