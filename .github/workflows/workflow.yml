@@ -29,7 +29,7 @@ on:
         required: false
         type: string
         description: "Syft version"
-        default: v0.45.1
+        default: v0.105.0
     secrets:
       GPG_PRIVATE_KEY_PASSPHRASE:
         required: false

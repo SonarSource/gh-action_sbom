@@ -23,7 +23,7 @@ inputs:
   syft-version:
     required: false
     description: "Syft version"
-    default: v0.45.1
+    default: v0.105.0
 
 runs:
   using: 'composite'
