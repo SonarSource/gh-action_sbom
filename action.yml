@@ -15,11 +15,11 @@ inputs:
   upload-artifact:
     required: false
     description: "Attach the SBOM to the workflow"
-    default: true
+    default: "true"
   upload-release-assets:
     required: false
     description: "Attach the SBOM to the release"
-    default: true
+    default: "true"
   syft-version:
     required: false
     description: "Syft version"
