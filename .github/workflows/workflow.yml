@@ -29,7 +29,7 @@ on:
         required: false
         type: string
         description: "Syft version"
-        default: v0.45.1
+        default: v0.105.0
     secrets:
       GPG_PRIVATE_KEY_PASSPHRASE:
         required: false
@@ -42,7 +42,7 @@ jobs:
   sbom:
     runs-on: ubuntu-latest
     steps:
-      - uses: anchore/sbom-action@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # tag=v0.13.0
+      - uses: anchore/sbom-action@e8d2a6937ecead383dfe75190d104edd1f9c5751 # v0.16.0
         with:
           image: ${{ inputs.image }}
           artifact-name: ${{ inputs.filename }}
@@ -73,6 +73,7 @@ jobs:
           path: |
             ${{ inputs.filename }}
             ${{ inputs.filename }}.asc
+          overwrite: true
       - name: Upload binaries to release
         if: inputs.upload-release-assets && startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # v2
