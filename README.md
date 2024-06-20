@@ -31,7 +31,7 @@ jobs:
 ### GitHub Reusable Workflow
 
 :warning: The strategy property is not supported in any job that calls a reusable workflow.
-See https://docs.github.com/en/actions/using-workflows/reusing-workflows#limitations
+See [reusing workflows limitations](https://docs.github.com/en/actions/using-workflows/reusing-workflows#limitations)
 
 ```yaml
 jobs:
@@ -49,13 +49,13 @@ jobs:
 
 ## Versioning
 
-Using the versioned semantic [tags](#Tags) is recommended for security and reliability.
+Using the versioned semantic [tags](#tags) is recommended for security and reliability.
 
 See [GitHub: Using tags for release management](https://docs.github.com/en/actions/creating-actions/about-custom-actions#using-tags-for-release-management)
 and [GitHub: Keeping your actions up to date with Dependabot](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/keeping-your-actions-up-to-date-with-dependabot)
 .
 
-For convenience, it is possible to use the [branches](#Branches) following the major releases.
+For convenience, it is possible to use the [branches](#branches) following the major releases.
 
 ### Tags
 
@@ -108,10 +108,9 @@ git push origin v1
 
 ### Warning Unexpected input
 
-> ```
 > Warning: Unexpected input(s) 'upload-artifact', 'upload-release-assets',
-> valid inputs are ['path', 'image', 'registry-username', 'registry-password', 'format', 'github-token', 'artifact-name', 'output-file', 'syft-version', 'dependency-snapshot']
-> ```
+> valid inputs are ['path', 'image', 'registry-username', 'registry-password', 'format', 'github-token',
+> 'artifact-name', 'output-file', 'syft-version', 'dependency-snapshot']
 
 The warning can be ignored, see anchore/sbom-action#269
 

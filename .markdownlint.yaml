@@ -1,0 +1,12 @@
+# Default state for all rules
+default: true
+
+# MD013/line-length - Line length
+MD013:
+  line_length: 120
+  tables: false
+
+# MD031/blanks-around-fences : Fenced code blocks should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md031.md
+MD031:
+  # Disable for list_items to create a tight list containing a code fence
+  list_items: false

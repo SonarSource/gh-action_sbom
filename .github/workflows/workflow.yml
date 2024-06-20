@@ -7,14 +7,11 @@ on:
         required: true
         type: string
         description: "The Docker image to scan."
-        #    description: "Newline-delimited list of Docker images to scan"
-        default: "example/image_name:tag"
+        # i.e: "example/image_name:tag"
       filename:
         required: true
         type: string
         description: "The generated SBOM file name"
-        #    description: "Newline-delimited list of generated SBOM file names"
-        default: "bom.json"
       upload-artifact:
         required: false
         type: boolean
