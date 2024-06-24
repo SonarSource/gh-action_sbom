@@ -11,12 +11,23 @@ The SBOM files are signed and eventually attached to the workflow and to the rel
 
 The BOM file is signed if the `upload-artifact` parameter is true and the GPG secrets are provided.
 
+Repositories needs to have access to the following secrets:
+  development/kv/data/sign passphrase
+  development/kv/data/sign key
+
 ### GitHub Action
 
 ```yaml
 jobs:
   job-calling-action:
     steps:
+      - name: get secrets
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@3996073b47b49ac5c58c750d27ab4edf469401c8 # 3.0.1
+        with:
+          secrets: |
+            development/kv/data/sign passphrase | gpg_passphrase;
+            development/kv/data/sign key | gpg_key;
       - uses: SonarSource/gh-action_sbom@v1
         with:
           image: example/image_name:tag
@@ -24,8 +35,8 @@ jobs:
           upload-artifact: true
           upload-release-assets: true
         env:
-          GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PRIVATE_KEY_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).gpg_passphrase }}
+          GPG_PRIVATE_KEY_BASE64: ${{ fromJSON(steps.secrets.outputs.vault).gpg_key }}
 ```
 
 ### GitHub Reusable Workflow
@@ -42,9 +53,6 @@ jobs:
       filename: bom.json
       upload-artifact: true
       upload-release-assets: true
-    secrets:
-      GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-      GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
 ```
 
 ## Versioning
