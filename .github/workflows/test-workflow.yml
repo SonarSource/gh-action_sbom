@@ -17,9 +17,6 @@ jobs:
       filename: test-workflow-bom.json
       upload-artifact: true
       upload-release-assets: true
-    secrets:
-      GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-      GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
   test2-workflow:
     name: Test SonarSource/gh-action_sbom on alpine:latest
     uses: ./.github/workflows/workflow.yml
