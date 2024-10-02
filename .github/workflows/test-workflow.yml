@@ -8,6 +8,10 @@ on:
       - created
   workflow_dispatch:
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   test-workflow:
     name: Test SonarSource/gh-action_sbom on alpine:latest
