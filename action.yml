@@ -25,7 +25,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: anchore/sbom-action@f5e124a5e5e1d497a692818ae907d3c45829d033 # v0.17.3
+    - uses: anchore/sbom-action@1ca97d9028b51809cf6d3c934c3e160716e1b605 # v0.17.5
       with:
         image: ${{ inputs.image }}
         artifact-name: ${{ inputs.filename }}
