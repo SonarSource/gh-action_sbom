@@ -25,7 +25,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: anchore/sbom-action@55dc4ee22412511ee8c3142cbea40418e6cec693 # v0.17.8
+    - uses: anchore/sbom-action@df80a981bc6edbc4e220a492d3cbe9f5547a6e75 # v0.17.9
       with:
         image: ${{ inputs.image }}
         artifact-name: ${{ inputs.filename }}
@@ -45,7 +45,7 @@ runs:
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --import <(echo "${GPG_PRIVATE_KEY_BASE64}")
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --detach-sign --armor "${{ inputs.filename }}"
         rm -rf "${GNUPGHOMEDIR}"
-    - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+    - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
       if: inputs.upload-artifact == 'true'
       with:
         name: "${{ inputs.filename }}"
