@@ -11,7 +11,7 @@ repos:
       - id: check-added-large-files
       - id: end-of-file-fixer
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 20447075e31543a8b125f2df18d75f3b5e7d4d2e # frozen: 0.22.0
+    rev: 78690b6ce14891a2ae695190a74e966217eec3c8  # frozen: 0.33.0
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/gruntwork-io/pre-commit
