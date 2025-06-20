@@ -21,6 +21,14 @@ inputs:
     required: false
     description: "Syft version"
     default: v0.105.0
+  registry-username:
+      required: false
+      type: string
+      description: "Registry username"
+  registry-password:
+      required: false
+      type: string
+      description: "Registry password"
 
 runs:
   using: "composite"
@@ -34,6 +42,8 @@ runs:
         syft-version: ${{ inputs.syft-version }}
         upload-artifact: ${{ inputs.upload-artifact }}
         upload-release-assets: ${{ inputs.upload-release-assets }}
+        registry-username: ${{ inputs.registry-username }}
+        registry-password: ${{ inputs.registry-password }}
       env:
         SYFT_QUIET: true
     - name: Sign CycloneDX SBOM
