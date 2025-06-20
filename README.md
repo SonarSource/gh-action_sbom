@@ -34,6 +34,8 @@ jobs:
           filename: bom.json
           upload-artifact: true
           upload-release-assets: true
+          registry-username: "username"
+          registry-password: "password"
         env:
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).gpg_passphrase }}
           GPG_PRIVATE_KEY_BASE64: ${{ fromJSON(steps.secrets.outputs.vault).gpg_key }}
