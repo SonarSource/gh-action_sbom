@@ -1,4 +1,4 @@
 ---
 self-hosted-runner:
   labels:
-    - ubuntu-24.04-large
+    - github-ubuntu-latest-s
