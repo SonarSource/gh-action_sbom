@@ -33,7 +33,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: anchore/sbom-action@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
+    - uses: anchore/sbom-action@f8bdd1d8ac5e901a77a92f111440fdb1b593736b # v0.20.6
       with:
         image: ${{ inputs.image }}
         artifact-name: ${{ inputs.filename }}
@@ -55,7 +55,7 @@ runs:
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --import <(echo "${GPG_PRIVATE_KEY_BASE64}")
         echo "${GPG_PRIVATE_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --quiet --detach-sign --armor "${{ inputs.filename }}"
         rm -rf "${GNUPGHOMEDIR}"
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: inputs.upload-artifact == 'true'
       with:
         name: "${{ inputs.filename }}"
@@ -65,7 +65,7 @@ runs:
         overwrite: true
     - name: Upload binaries to release
       if: inputs.upload-release-assets == 'true' && startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # v2
+      uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # v2
       with:
         repo_token: ${{ github.token }}
         file_glob: true
