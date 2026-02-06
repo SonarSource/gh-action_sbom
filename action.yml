@@ -20,7 +20,7 @@ inputs:
   syft-version:
     required: false
     description: "Syft version"
-    default: v0.105.0
+    default: v1.41.2
   registry-username:
       required: false
       type: string
@@ -33,7 +33,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: anchore/sbom-action@f8bdd1d8ac5e901a77a92f111440fdb1b593736b # v0.20.6
+    - uses: anchore/sbom-action@28d71544de8eaf1b958d335707167c5f783590ad # v0.22.2
       with:
         image: ${{ inputs.image }}
         artifact-name: ${{ inputs.filename }}
