@@ -17,6 +17,9 @@ inputs:
     required: false
     description: "Attach the SBOM to the release"
     default: "true"
+  release-id:
+    required: false
+    description: "GitHub release id to attach the SBOM to. Use instead of a tag when uploading to a draft release."
   syft-version:
     required: false
     description: "Syft version"
@@ -66,11 +69,12 @@ runs:
           ${{ inputs.filename }}.asc
         overwrite: true
     - name: Upload binaries to release
-      if: inputs.upload-release-assets == 'true' && startsWith(github.ref, 'refs/tags/')
+      if: inputs.upload-release-assets == 'true' && (inputs.release-id != '' || startsWith(github.ref, 'refs/tags/'))
       uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # v2
       with:
         repo_token: ${{ github.token }}
         file_glob: true
         file: "${{ inputs.filename }}?(.asc)"
-        tag: ${{ github.ref }}
+        release_id: ${{ inputs.release-id }}
+        tag: ${{ inputs.release-id == '' && github.ref || '' }}
         overwrite: true
