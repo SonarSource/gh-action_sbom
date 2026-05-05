@@ -15,6 +15,15 @@ Repositories needs to have access to the following secrets:
   development/kv/data/sign passphrase
   development/kv/data/sign key
 
+### Required permissions
+
+The calling job must grant:
+
+```yaml
+permissions:
+  contents: write  # create/update releases and upload assets
+```
+
 ### GitHub Action
 
 ```yaml
@@ -36,6 +45,7 @@ jobs:
           upload-release-assets: true
           registry-username: "username"
           registry-password: "password"
+          # release-tag: ${{ inputs.tag_name }}  # required when not running on a tag ref
         env:
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).gpg_passphrase }}
           GPG_PRIVATE_KEY_BASE64: ${{ fromJSON(steps.secrets.outputs.vault).gpg_key }}
@@ -55,6 +65,39 @@ jobs:
       filename: bom.json
       upload-artifact: true
       upload-release-assets: true
+      # release-tag: ${{ inputs.tag_name }}  # required when not running on a tag ref
+```
+
+### GitHub Release Immutability
+
+When GitHub Release Immutability is enforced, assets cannot be uploaded to a published release (HTTP 422).
+
+#### Draft-first workflow (required)
+
+1. Run this action — it creates a draft release for the resolved tag (if none exists) and attaches the SBOM and its GPG signature.
+2. Publish the release after the workflow completes.
+
+If the release is already published, the action skips the SBOM upload with a warning.
+
+#### Running from a branch ref (e.g. `workflow_dispatch`)
+
+When the workflow is not triggered from a tag ref, `GITHUB_REF` does not point to a tag.
+Pass the tag explicitly via the `release-tag` input:
+
+```yaml
+      - uses: SonarSource/gh-action_sbom@v1
+        with:
+          image: example/image_name:tag
+          filename: bom.json
+          upload-release-assets: true
+          release-tag: ${{ inputs.tag_name }}
+        env:
+          GPG_PRIVATE_KEY_PASSPHRASE: ${{ fromJSON(steps.secrets.outputs.vault).gpg_passphrase }}
+          GPG_PRIVATE_KEY_BASE64: ${{ fromJSON(steps.secrets.outputs.vault).gpg_key }}
+      # ... after all assets are attached:
+      - run: gh release edit "${{ inputs.tag_name }}" --draft=false
+        env:
+          GH_TOKEN: ${{ github.token }}
 ```
 
 ## Versioning
