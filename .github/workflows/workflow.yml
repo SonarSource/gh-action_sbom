@@ -20,8 +20,12 @@ on:
       upload-release-assets:
         required: false
         type: boolean
-        description: "Attach the SBOM to the release"
+        description: "Create release and attach the SBOM. Ignored if the release is already published (non-draft)."
         default: true
+      release-tag:
+        required: false
+        type: string
+        description: "Tag name of the release to attach the SBOM to. Defaults to the tag from GITHUB_REF. Use when the workflow is not running on a tag ref (e.g. workflow_dispatch from a branch)."
       syft-version:
         required: false
         type: string
@@ -52,6 +56,38 @@ jobs:
     runs-on: github-ubuntu-latest-s
 
     steps:
+      - name: Resolve upload-release-assets
+        id: check-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          INPUT_UPLOAD: ${{ inputs.upload-release-assets }}
+          INPUT_RELEASE_TAG: ${{ inputs.release-tag }}
+        run: |
+          enabled="$INPUT_UPLOAD"
+          tag=""
+          if [[ "$INPUT_UPLOAD" == "true" ]]; then
+            if [[ -n "$INPUT_RELEASE_TAG" ]]; then
+              tag="$INPUT_RELEASE_TAG"
+            elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              tag="${GITHUB_REF#refs/tags/}"
+            else
+              echo "::warning::upload-release-assets is true but no release-tag input provided and not on a tag ref. SBOM not attached to release."
+              enabled="false"
+            fi
+          fi
+          if [[ "$enabled" == "true" && -n "$tag" ]]; then
+            if is_draft=$(gh release view "$tag" --json isDraft --jq '.isDraft' 2>/dev/null); then
+              if [[ "$is_draft" != "true" ]]; then
+                echo "::warning::Release '$tag' is already published (immutable). SBOM not attached to release. Use a draft-first workflow: create the release as a draft, run this action while it is still a draft, then publish."
+                enabled="false"
+              fi
+            else
+              gh release create "$tag" --draft --title "Release $tag"
+            fi
+          fi
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - uses: anchore/sbom-action@28d71544de8eaf1b958d335707167c5f783590ad # v0.22.2
         with:
           image: ${{ inputs.image }}
@@ -59,8 +95,8 @@ jobs:
           output-file: ${{ inputs.filename }}
           format: cyclonedx-json
           syft-version: ${{ inputs.syft-version }}
-          upload-artifact: ${{ inputs.upload-artifact }}
-          upload-release-assets: ${{ inputs.upload-release-assets }}
+          upload-artifact: false
+          upload-release-assets: false
           registry-username: ${{ inputs.registry-username }}
           registry-password: ${{ inputs.registry-password }}
         env:
@@ -94,12 +130,14 @@ jobs:
             ${{ inputs.filename }}
             ${{ inputs.filename }}.asc
           overwrite: true
-      - name: Upload binaries to release
-        if: inputs.upload-release-assets && startsWith(github.ref, 'refs/tags/')
-        uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # v2
-        with:
-          repo_token: ${{ github.token }}
-          file_glob: true
-          file: "${{ inputs.filename }}?(.asc)"
-          tag: ${{ github.ref }}
-          overwrite: true
+      - name: Upload SBOM to release
+        if: steps.check-release.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SBOM_FILENAME: ${{ inputs.filename }}
+          RELEASE_TAG: ${{ steps.check-release.outputs.tag }}
+        run: |
+          files=("$SBOM_FILENAME")
+          [[ -f "${SBOM_FILENAME}.asc" ]] && files+=("${SBOM_FILENAME}.asc")
+          gh release upload "$RELEASE_TAG" "${files[@]}" --clobber
