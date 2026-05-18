@@ -9,7 +9,7 @@ jobs:
       id-token: write
       contents: write
     name: Test SonarSource/gh-action_sbom on alpine:latest
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     steps:
       - name: get secrets
         id: secrets
@@ -46,7 +46,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     env:
       RELEASE_TAG: test/ci-sbom-${{ github.run_id }}
     steps:
