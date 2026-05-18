@@ -29,7 +29,7 @@ jobs:
     name: Create temp tag for upload test
     permissions:
       contents: write
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     outputs:
       tag: ${{ steps.create-tag.outputs.tag }}
     steps:
@@ -66,7 +66,7 @@ jobs:
     if: always() && needs.setup-upload-test.result == 'success'
     permissions:
       contents: write
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     steps:
       - name: Verify SBOM attached to release
         if: needs.test-upload-workflow.result == 'success'
