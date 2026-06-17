@@ -2,3 +2,4 @@
 self-hosted-runner:
   labels:
     - github-ubuntu-latest-s
+    - sonar-xs
