@@ -13,12 +13,12 @@ jobs:
     steps:
       - name: get secrets
         id: secrets
-        uses: SonarSource/vault-action-wrapper@320bd31b03e5dacaac6be51bbbb15adf7caccc32 # 3.1.0
+        uses: SonarSource/vault-action-wrapper@881045d830534a70ec3c7c275fa3714412c8ff6e # 3.6.1
         with:
           secrets: |
             development/kv/data/sign passphrase | gpg_passphrase;
             development/kv/data/sign key | gpg_key;
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           path: ./
       - uses: ./ # SonarSource/gh-action_sbom
@@ -50,10 +50,10 @@ jobs:
     env:
       RELEASE_TAG: test/ci-sbom-${{ github.run_id }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: get secrets
         id: secrets
-        uses: SonarSource/vault-action-wrapper@320bd31b03e5dacaac6be51bbbb15adf7caccc32 # 3.1.0
+        uses: SonarSource/vault-action-wrapper@881045d830534a70ec3c7c275fa3714412c8ff6e # 3.6.1
         with:
           secrets: |
             development/kv/data/sign passphrase | gpg_passphrase;
