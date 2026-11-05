@@ -58,14 +58,6 @@ jobs:
           secrets: |
             development/kv/data/sign passphrase | gpg_passphrase;
             development/kv/data/sign key | gpg_key;
-      - name: Create temp tag
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$RELEASE_TAG"
-          git push origin "$RELEASE_TAG"
       - uses: ./ # SonarSource/gh-action_sbom
         with:
           image: alpine:latest
@@ -84,11 +76,9 @@ jobs:
           echo "Release assets: $assets"
           echo "$assets" | jq -e 'map(select(. == "test-upload-bom.json")) | length > 0'
           echo "$assets" | jq -e 'map(select(. == "test-upload-bom.json.asc")) | length > 0'
-      - name: Cleanup temp release and tag
+      - name: Cleanup temp draft release
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: |
-          gh release delete "$RELEASE_TAG" --yes 2>/dev/null || true
-          gh api "repos/{owner}/{repo}/git/refs/tags/$RELEASE_TAG" --method DELETE 2>/dev/null || true
+        run: gh release delete "$RELEASE_TAG" --yes || echo "::warning::Could not delete the temp draft release $RELEASE_TAG"

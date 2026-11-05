@@ -25,45 +25,23 @@ jobs:
       upload-artifact: false
       upload-release-assets: false
 
-  setup-upload-test:
-    name: Create temp tag for upload test
-    permissions:
-      contents: write
-    runs-on: github-ubuntu-latest-s
-    outputs:
-      tag: ${{ steps.create-tag.outputs.tag }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create temp tag
-        id: create-tag
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          tag="test/ci-sbom-wf-$GITHUB_RUN_ID"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$tag"
-          git push origin "$tag"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-
   test-upload-workflow:
     name: Test upload-release-assets (workflow)
-    needs: setup-upload-test
     uses: ./.github/workflows/workflow.yml
     with:
       image: alpine:latest
       filename: test-workflow-upload-bom.json
       upload-artifact: true
       upload-release-assets: true
-      release-tag: ${{ needs.setup-upload-test.outputs.tag }}
+      release-tag: test/ci-sbom-wf-${{ github.run_id }}
     permissions:
       contents: write
       id-token: write
 
   verify-and-cleanup:
     name: Verify and cleanup upload test
-    needs: [setup-upload-test, test-upload-workflow]
-    if: always() && needs.setup-upload-test.result == 'success'
+    needs: test-upload-workflow
+    if: always()
     permissions:
       contents: write
     runs-on: github-ubuntu-latest-s
@@ -73,18 +51,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TAG: ${{ needs.setup-upload-test.outputs.tag }}
+          TAG: test/ci-sbom-wf-${{ github.run_id }}
         run: |
           assets=$(gh release view "$TAG" --json assets --jq '[.assets[].name]')
           echo "Release assets: $assets"
           echo "$assets" | jq -e 'map(select(. == "test-workflow-upload-bom.json")) | length > 0'
           echo "$assets" | jq -e 'map(select(. == "test-workflow-upload-bom.json.asc")) | length > 0'
-      - name: Cleanup temp release and tag
+      - name: Cleanup temp draft release
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TAG: ${{ needs.setup-upload-test.outputs.tag }}
-        run: |
-          gh release delete "$TAG" --yes 2>/dev/null || true
-          gh api "repos/{owner}/{repo}/git/refs/tags/$TAG" --method DELETE 2>/dev/null || true
+          TAG: test/ci-sbom-wf-${{ github.run_id }}
+        run: gh release delete "$TAG" --yes || echo "::warning::Could not delete the temp draft release $TAG"
