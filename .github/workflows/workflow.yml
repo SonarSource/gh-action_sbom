@@ -88,7 +88,7 @@ jobs:
           fi
           echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-      - uses: anchore/sbom-action@28d71544de8eaf1b958d335707167c5f783590ad # v0.22.2
+      - uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
         with:
           image: ${{ inputs.image }}
           artifact-name: ${{ inputs.filename }}
@@ -103,7 +103,7 @@ jobs:
           SYFT_QUIET: true
       - name: get secrets
         id: secrets
-        uses: SonarSource/vault-action-wrapper@320bd31b03e5dacaac6be51bbbb15adf7caccc32 # 3.1.0
+        uses: SonarSource/vault-action-wrapper@a7fa5fd4a4e4e0f2593f6137c0812cac196cf4ce # 3.7.0
         with:
           secrets: |
             development/kv/data/sign passphrase | gpg_passphrase;
